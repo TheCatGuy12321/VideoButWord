@@ -1,5 +1,4 @@
 ffmpeg
 moviepy
-pydub
 # Run this seperately:
 # pip install -U git+https://github.com/linto-ai/whisper-timestamped

@@ -1,7 +1,8 @@
 import ffmpeg
+import shutil
+import os
 from os import path, remove
 import whisper_timestamped as whisper
-from pydub import AudioSegment
 from sys import argv
 import datetime
 from moviepy.editor import concatenate_videoclips, VideoFileClip
@@ -14,13 +15,12 @@ WORD = argv[2]
 
 FILE_NAME = argv[1] # file name
 
-AUDIO_PATH = "Outputs/%s.wav"%FILE_NAME
+AUDIO_PATH = path.abspath("Outputs/%s.wav"%FILE_NAME)
 if not path.exists(AUDIO_PATH):
     print("Converting video to Audio...")
-    sound = AudioSegment.from_file("Inputs/%s.mp4"%FILE_NAME, format="mp4") # video -> audio
-    sound.export(AUDIO_PATH, format="wav")
+    video = VideoFileClip("Inputs/%s.mp4"%FILE_NAME)
+    video.audio.write_audiofile(AUDIO_PATH)
 
-AUDIO_FILE = path.abspath("Outputs/%s.wav"%FILE_NAME) # Audio file path
 
 SAVE_PATH = path.abspath(f"Outputs/{FILE_NAME}.tscr")
 
@@ -33,7 +33,7 @@ if path.exists(SAVE_PATH):
     
 else:
     # Transcribe audio
-    result = whisper.transcribe("tiny", AUDIO_FILE)
+    result = whisper.transcribe("tiny", AUDIO_PATH)
     for segment in result['segments']:
         words = segment['words']
         for j in words:
@@ -83,3 +83,11 @@ except ValueError:
 for line in StrToSave.splitlines():
     if path.exists(outpath):
         remove(outpath)
+
+trimmed_path = path.abspath("Trimmed")
+for filename in os.listdir(trimmed_path):
+    file_path = os.path.join(trimmed_path, filename)
+    if os.path.isfile(file_path) or os.path.islink(file_path):
+        os.unlink(file_path)
+    elif os.path.isdir(file_path):
+        shutil.rmtree(file_path)
