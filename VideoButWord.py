@@ -1,7 +1,7 @@
 import ffmpeg
 from os import path, remove
 import whisper_timestamped as whisper
-from pydub import AudioSegment
+#from pydub import AudioSegment
 from sys import argv
 import datetime
 from moviepy.editor import concatenate_videoclips, VideoFileClip
@@ -14,13 +14,14 @@ WORD = argv[2]
 
 FILE_NAME = argv[1] # file name
 
-sound = AudioSegment.from_file("Inputs/%s.mp4"%FILE_NAME, format="mp4") # video -> audio
-sound.export("Outputs/%s.wav"%FILE_NAME, format="wav")
+#sound = AudioSegment.from_file("Inputs/%s.mp4"%FILE_NAME, format="mp4") # video -> audio
+#sound.export("Outputs/%s.wav"%FILE_NAME, format="wav")
 
-AUDIO_FILE = path.abspath("Outputs/%s.wav"%FILE_NAME) # Audio file path
+#AUDIO_FILE = path.abspath("Outputs/%s.wav"%FILE_NAME) # Audio file path
+VIDEO_FILE = path.abspath("Inputs/%s.mp4"%FILE_NAME)
 
 # Transcribe audio
-result = whisper.transcribe("base", AUDIO_FILE)
+result = whisper.transcribe("tiny", VIDEO_FILE)
 
 CustomTranscipt = ""
 
@@ -69,3 +70,5 @@ concatenate(vidL, OUT_FILE3)
 for line in StrToSave.splitlines():
     if path.exists(outpath):
         remove(outpath)
+
+#remove(path.abspath(f"Outputs/{FILE_NAME}.wav"))
