@@ -72,9 +72,9 @@ def concatenate(video_clip_paths, output_path):
     final_clip.write_videofile(output_path)
 
 # Concatenate everything
-OUT_FILE3 = path.abspath(f"Outputs/{FILE_NAME}.mp4")
-if path.exists(OUT_FILE3): remove(OUT_FILE3)
-concatenate(vidL, OUT_FILE3)
+OUT_FILE = path.abspath(f"Outputs/{FILE_NAME}.mp4")
+if path.exists(OUT_FILE): remove(OUT_FILE)
+concatenate(vidL, OUT_FILE)
 
 # Remove the trimmed parts to save disk space
 for line in StrToSave.splitlines():
