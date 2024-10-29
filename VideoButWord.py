@@ -22,13 +22,6 @@ AUDIO_FILE = path.abspath("Outputs/%s.wav"%FILE_NAME) # Audio file path
 # Transcribe audio
 result = whisper.transcribe("base", AUDIO_FILE)
 
-# output json file
-OUT_FILE = path.abspath("Outputs/%s.json"%FILE_NAME)
-with open(OUT_FILE, "w") as f:
-    f.truncate(0)
-    f.write(str(result))
-    f.close()
-
 CustomTranscipt = ""
 
 for segment in result['segments']:
@@ -47,18 +40,6 @@ for line in CustomTranscipt.splitlines():
     if linesSep[2] == WORD:
         StrToSave += line + "\n"
 
-OUT_FILE2 = path.abspath("Outputs/%s.tsrc"%FILE_NAME) # Custom file type where data is stored in plaintext
-# .tsrc format:
-# start:end:word
-# start:end:word
-# etc..
-
-with open(OUT_FILE2, "w") as f:
-    f.truncate(0)
-    f.write(StrToSave)
-    f.close()
-
-
 # Trim video
 
 vidL = []
@@ -66,7 +47,7 @@ Iter = 0 # temporary iterator
 for line in StrToSave.splitlines():
     Iter += 1
     linesSep = line.split(":")
-    start = str(datetime.timedelta(seconds=float(linesSep[0])-0.1))
+    start = str(datetime.timedelta(seconds=float(linesSep[0])))
     end = str(datetime.timedelta(seconds=float(linesSep[1])+0.1))
     outpath = path.abspath(f"Trimmed/{Iter}.mp4")
     if path.exists(outpath):
@@ -85,3 +66,8 @@ def concatenate(video_clip_paths, output_path):
 OUT_FILE3 = path.abspath(f"Outputs/{FILE_NAME}.mp4")
 if path.exists(OUT_FILE3): remove(OUT_FILE3)
 concatenate(vidL, OUT_FILE3)
+
+# Remove the trimmed parts to save disk space
+for line in StrToSave.splitlines():
+    if path.exists(outpath):
+        remove(outpath)
