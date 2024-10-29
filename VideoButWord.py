@@ -5,7 +5,7 @@ from os import path, remove
 import whisper_timestamped as whisper
 from sys import argv
 import datetime
-from moviepy.editor import concatenate_videoclips, VideoFileClip
+from moviepy.editor import concatenate_videoclips, VideoFileClip, AudioFileClip
 
 if len(argv) != 3:
     print(f"usage: {argv[0]} VIDEO WORD\nVIDEO should be in the folder Inputs.\nDon't input relative path e.g. Inputs/test.mp4, input the name for the video e.g. test")
@@ -18,8 +18,9 @@ FILE_NAME = argv[1] # file name
 AUDIO_PATH = path.abspath("Outputs/%s.wav"%FILE_NAME)
 if not path.exists(AUDIO_PATH):
     print("Converting video to Audio...")
-    video = VideoFileClip("Inputs/%s.mp4"%FILE_NAME)
-    video.audio.write_audiofile(AUDIO_PATH, verbose=False, logger=None)
+    video = AudioFileClip("Inputs/%s.mp4"%FILE_NAME)
+    video.write_audiofile(AUDIO_PATH, codec="pcm_s16le")
+    video.close()
 
 
 SAVE_PATH = path.abspath(f"Outputs/{FILE_NAME}.tscr")
