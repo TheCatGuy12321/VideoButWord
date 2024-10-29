@@ -1,6 +1,7 @@
 import ffmpeg
 from os import path, remove
 import whisper_timestamped as whisper
+from pydub import AudioSegment
 from sys import argv
 import datetime
 from moviepy.editor import concatenate_videoclips, VideoFileClip
@@ -13,29 +14,43 @@ WORD = argv[2]
 
 FILE_NAME = argv[1] # file name
 
-VIDEO_FILE = path.abspath("Inputs/%s.mp4"%FILE_NAME)
+AUDIO_PATH = "Outputs/%s.wav"%FILE_NAME
+if not path.exists(AUDIO_PATH):
+    print("Converting video to Audio...")
+    sound = AudioSegment.from_file("Inputs/%s.mp4"%FILE_NAME, format="mp4") # video -> audio
+    sound.export(AUDIO_PATH, format="wav")
 
-# Transcribe audio
-result = whisper.transcribe("tiny", VIDEO_FILE)
+AUDIO_FILE = path.abspath("Outputs/%s.wav"%FILE_NAME) # Audio file path
+
+SAVE_PATH = path.abspath(f"Outputs/{FILE_NAME}.tscr")
 
 CustomTranscipt = ""
+# Reuse transcript if already saved
+if path.exists(SAVE_PATH):
+    with open(SAVE_PATH, "r") as f:
+        CustomTranscipt = f.read()
+        f.close()
+    
+else:
+    # Transcribe audio
+    result = whisper.transcribe("tiny", AUDIO_FILE)
+    for segment in result['segments']:
+        words = segment['words']
+        for j in words:
+            start, end = j['start'], j['end']
+            CustomTranscipt += f"{start}:{end}:{j['text'].strip()}\n"
+    with open(SAVE_PATH, "w") as f:
+        f.write(CustomTranscipt)
+        f.close()
 
-for segment in result['segments']:
-    words = segment['words']
-    for j in words:
-        start, end = j['start'], j['end']
-        CustomTranscipt += f"{start}:{end}:{j['text'].strip()}\n"
-
-
-StrToSave = "" # Cut transcript
-
+# Cut transcript
+StrToSave = ""
 for line in CustomTranscipt.splitlines():
     linesSep = line.split(":")
     if WORD in linesSep[2]:
         StrToSave += line + "\n"
 
 # Trim video
-
 vidL = []
 Iter = 0 # temporary iterator
 for line in StrToSave.splitlines():
@@ -65,3 +80,5 @@ concatenate(vidL, OUT_FILE3)
 for line in StrToSave.splitlines():
     if path.exists(outpath):
         remove(outpath)
+
+remove(path.abspath(f"Outputs/{FILE_NAME}.wav"))
