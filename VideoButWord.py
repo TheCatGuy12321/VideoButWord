@@ -30,8 +30,6 @@ for segment in result['segments']:
         start, end = j['start'], j['end']
         CustomTranscipt += f"{start}:{end}:{j['text'].strip()}\n"
 
-print(f"Output saved to {FILE_NAME}.tsrc")
-
 
 StrToSave = "" # Cut transcript
 
