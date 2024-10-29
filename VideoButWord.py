@@ -31,7 +31,7 @@ StrToSave = "" # Cut transcript
 
 for line in CustomTranscipt.splitlines():
     linesSep = line.split(":")
-    if linesSep[2] == WORD:
+    if WORD in linesSep[2]:
         StrToSave += line + "\n"
 
 # Trim video
