@@ -19,7 +19,7 @@ AUDIO_PATH = path.abspath("Outputs/%s.wav"%FILE_NAME)
 if not path.exists(AUDIO_PATH):
     print("Converting video to Audio...")
     video = VideoFileClip("Inputs/%s.mp4"%FILE_NAME)
-    video.audio.write_audiofile(AUDIO_PATH)
+    video.audio.write_audiofile(AUDIO_PATH, verbose=False, logger=None)
 
 
 SAVE_PATH = path.abspath(f"Outputs/{FILE_NAME}.tscr")
